@@ -92,6 +92,69 @@ const procesoImg = document.getElementById("proceso-img");
 
 if (pasos.length && procesoImg) {
 
+    let actual = 0;
+    let intervalo;
+
+    function mostrarPaso(indice){
+
+        pasos.forEach(item=>item.classList.remove("active"));
+
+        pasos[indice].classList.add("active");
+
+        procesoImg.style.opacity = "0";
+
+        setTimeout(()=>{
+
+            procesoImg.src = pasos[indice].dataset.img;
+
+            procesoImg.style.opacity = "1";
+
+        },180);
+
+        actual = indice;
+
+    }
+
+    function iniciarAuto(){
+
+        clearInterval(intervalo);
+
+        intervalo = setInterval(()=>{
+
+            actual++;
+
+            if(actual >= pasos.length){
+
+                actual = 0;
+
+            }
+
+            mostrarPaso(actual);
+
+        },7000);
+
+    }
+
+    pasos.forEach((paso,indice)=>{
+
+        paso.addEventListener("click",()=>{
+
+            mostrarPaso(indice);
+
+            iniciarAuto();
+
+        });
+
+    });
+
+    mostrarPaso(0);
+
+    iniciarAuto();
+
+}
+
+if (pasos.length && procesoImg) {
+
     pasos.forEach(paso => {
 
         paso.addEventListener("click", () => {
@@ -314,5 +377,115 @@ if(faqItems.length){
     primera.classList.add("is-open");
     primera.querySelector(".faq-body").style.maxHeight =
         primera.querySelector(".faq-body").scrollHeight + "px";
+
+}
+/*==================================================
+ESTADÍSTICAS
+==================================================*/
+
+const estadisticas = document.querySelector(".estadisticas");
+
+if (estadisticas) {
+
+    const contadores = estadisticas.querySelectorAll(".contador");
+    let ejecutado = false;
+
+    function iniciarContadores() {
+
+        if (ejecutado) return;
+
+        ejecutado = true;
+
+        contadores.forEach(contador => {
+
+            const objetivo = parseInt(contador.dataset.target);
+            const duracion = 1800;
+            const inicio = performance.now();
+
+            function actualizar(tiempo) {
+
+                const progreso = Math.min((tiempo - inicio) / duracion, 1);
+
+                contador.textContent = Math.floor(progreso * objetivo);
+
+                if (progreso < 1) {
+
+                    requestAnimationFrame(actualizar);
+
+                } else {
+
+                    contador.textContent = objetivo;
+
+                }
+
+            }
+
+            requestAnimationFrame(actualizar);
+
+        });
+
+    }
+
+    const observer = new IntersectionObserver((entries) => {
+
+        entries.forEach(entry => {
+
+            if (entry.isIntersecting) {
+
+                iniciarContadores();
+
+                observer.disconnect();
+
+            }
+
+        });
+
+    }, {
+
+        threshold: 0.45
+
+    });
+
+    observer.observe(estadisticas);
+
+}
+/*==================================================
+HERRAMIENTAS
+==================================================*/
+
+const herramientas = document.querySelectorAll(".herramienta");
+
+if (herramientas.length) {
+
+    // La primera queda abierta al cargar
+    herramientas[0].classList.add("activa");
+
+    herramientas.forEach(herramienta => {
+
+        herramienta.addEventListener("mouseenter", () => {
+
+            herramientas.forEach(item => {
+
+                item.classList.remove("activa");
+
+            });
+
+            herramienta.classList.add("activa");
+
+        });
+
+        herramienta.addEventListener("click", () => {
+
+            herramientas.forEach(item => {
+
+                item.classList.remove("activa");
+
+            });
+
+            herramienta.classList.add("activa");
+
+        });
+
+    });
 
 }
